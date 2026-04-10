@@ -18,6 +18,11 @@ jobs:
 
       - name: Check dependency pins
         uses: naomi-lgbt/dependency-pin-check@main
+        with:
+           language: javascript
+           dev-dependencies: true
+           peer-dependencies: true
+           optional-dependencies: true
 
       - name: Install Linux dependencies
         run: |
