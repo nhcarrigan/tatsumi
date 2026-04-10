@@ -1,20 +1,44 @@
-# New Repository Template
+# Tatsumi
 
-This template contains all of our basic files for a new GitHub repository. There is also a handy workflow that will create an issue on a new repository made from this template, with a checklist for the steps we usually take in setting up a new repository.
+Tatsumi is a desktop app for generating AI character art powered by Google Gemini's image model. It's built specifically to generate art of Naomi, with her reference sheet pre-loaded so you just describe the scene.
 
-If you're starting a Node.JS project with TypeScript, we have a [specific template](https://github.com/naomi-lgbt/nodejs-typescript-template) for that purpose.
+## Features
 
-## Readme
+### Three generation modes
 
-Delete all of the above text (including this line), and uncomment the below text to use our standard readme template.
+- **Avatar** — Generate a portrait or avatar from a text prompt (1:1 aspect ratio)
+- **Art** — Generate a full widescreen piece from a text prompt (16:9 aspect ratio)
+- **Replace** — Upload a source image and describe what you want changed or reimagined
 
-<!-- # Project Name
+### Conversation threads
 
-Project Description
+Each generation session is a thread. You can send follow-up messages to refine the result, retry any response, edit a previous prompt and re-run, or delete messages. Threads are saved locally and persist between sessions.
 
-## Live Version
+### Other bits
 
-This page is currently deployed. [View the live website.]
+- Model reasoning is shown as a collapsible "Model reasoning" section on each response
+- Cost per response is displayed (input + output tokens)
+- Generated images can be downloaded directly from the chat
+- App version shown in the sidebar header
+
+## Setup
+
+You'll need a [Google Gemini API key](https://aistudio.google.com/apikey) to use Tatsumi. On first launch, you'll be prompted to enter it. You can update it any time via Settings.
+
+## Running locally
+
+```bash
+pnpm install
+pnpm tauri dev
+```
+
+## Building
+
+```bash
+pnpm tauri build
+# or for Windows cross-compilation:
+pnpm build:windows
+```
 
 ## Feedback and Bugs
 
@@ -36,4 +60,4 @@ Copyright held by Naomi Carrigan.
 
 ## Contact
 
-We may be contacted through our [Chat Server](http://chat.nhcarrigan.com) or via email at `contact@nhcarrigan.com`. -->
+We may be contacted through our [Chat Server](https://chat.nhcarrigan.com) or via email at `contact@nhcarrigan.com`.
