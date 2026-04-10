@@ -1,6 +1,6 @@
 [package]
 name = "tatsumi"
-version = "0.1.0"
+version = "1.0.0"
 description = "Tatsumi - AI art generation using Google Gemini"
 authors = ["Naomi Carrigan"]
 edition = "2021"
