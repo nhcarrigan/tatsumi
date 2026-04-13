@@ -256,7 +256,8 @@ const inputArea = ({
     if (isInitialReplace && imageBase64 === undefined) {
       return;
     }
-    if (!isInitialReplace && text.trim().length === 0) {
+    const hasContent = text.trim().length > 0 || imageBase64 !== undefined;
+    if (!isInitialReplace && !hasContent) {
       return;
     }
 
@@ -332,6 +333,9 @@ const inputArea = ({
       : dropZoneInactiveClass,
   ].join(" ");
 
+  const hasNoContent = text.trim().length === 0 && imageBase64 === undefined;
+  const isSendDisabled = isLoading || hasNoContent;
+
   return (
     <div className="border-t border-purple-900/30 p-4 bg-[#0f0a1a]">
       <div className="flex items-center gap-2 mb-2">
@@ -397,6 +401,15 @@ const inputArea = ({
             type="file"
           />
 
+          <textarea
+            className={textareaClass}
+            disabled={isLoading}
+            onChange={handleTextChange}
+            placeholder="Add notes to include with the image (optional)..."
+            rows={2}
+            value={text}
+          />
+
           <button
             className={replaceButtonClass}
             disabled={isLoading || imageBase64 === undefined}
@@ -414,41 +427,40 @@ const inputArea = ({
         </div>
 
         : <div className="flex flex-col gap-3">
-          {mode === "replace"
-            ? <div className="flex flex-col gap-2">
-              {imagePreview === undefined
-                ? <button
-                  className={pasteButtonClass}
-                  onClick={handlePasteButtonClick}
+          <div className="flex flex-col gap-2">
+            {imagePreview === undefined
+              ? <button
+                className={pasteButtonClass}
+                onClick={handlePasteButtonClick}
+                type="button"
+              >
+                {mode === "replace"
+                  ? "📋 Paste replacement image (optional)"
+                  : "📋 Paste image (optional)"}
+              </button>
+
+              : <div className="relative inline-block">
+                <img
+                  alt="Upload preview"
+                  className="max-h-32 rounded-lg border border-purple-700/40"
+                  src={imagePreview}
+                />
+                <button
+                  className={clearButtonClass}
+                  onClick={clearImage}
                   type="button"
                 >
-                  {"📋 Paste replacement image (optional)"}
+                  {"×"}
                 </button>
-
-                : <div className="relative inline-block">
-                  <img
-                    alt="Upload preview"
-                    className="max-h-32 rounded-lg border border-purple-700/40"
-                    src={imagePreview}
-                  />
-                  <button
-                    className={clearButtonClass}
-                    onClick={clearImage}
-                    type="button"
-                  >
-                    {"×"}
-                  </button>
-                </div>}
-              <input
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-                ref={fileInputReference}
-                type="file"
-              />
-            </div>
-
-            : null}
+              </div>}
+            <input
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+              ref={fileInputReference}
+              type="file"
+            />
+          </div>
 
           <div className="flex gap-3 items-end">
             <textarea
@@ -464,7 +476,7 @@ const inputArea = ({
             />
             <button
               className={sendButtonClass}
-              disabled={isLoading || text.trim().length === 0}
+              disabled={isSendDisabled}
               onClick={handleSend}
               type="button"
             >
