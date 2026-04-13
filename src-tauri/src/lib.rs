@@ -49,13 +49,24 @@ async fn save_config(config: Config) -> Result<(), String> {
 async fn send_message(
     api_key: String,
     mode: String,
+    aspect_ratio: Option<String>,
+    image_size: String,
     history: Vec<ThreadMessage>,
     user_text: Option<String>,
     user_image_base64: Option<String>,
     user_image_mime: Option<String>,
 ) -> Result<SendMessageResult, String> {
-    let (parts, cost_usd) =
-        call_gemini(api_key, mode, history, user_text, user_image_base64, user_image_mime).await?;
+    let (parts, cost_usd) = call_gemini(
+        api_key,
+        mode,
+        aspect_ratio,
+        image_size,
+        history,
+        user_text,
+        user_image_base64,
+        user_image_mime,
+    )
+    .await?;
     Ok(SendMessageResult { parts, cost_usd })
 }
 

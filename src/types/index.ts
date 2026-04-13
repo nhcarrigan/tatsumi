@@ -5,6 +5,8 @@
  * @author Naomi Carrigan
  */
 
+type AspectRatio = "1:1" | "3:4" | "4:3" | "9:16" | "16:9" | "21:9";
+type ImageSize = "1K" | "2K" | "4K";
 type Mode = "avatar" | "art" | "replace";
 
 interface Config {
@@ -33,12 +35,23 @@ interface ThreadMessage {
 }
 
 interface Thread {
-  createdAt: number;
-  id:        string;
-  messages:  Array<ThreadMessage>;
-  mode:      Mode;
-  name:      string;
-  updatedAt: number;
+  aspectRatio?: AspectRatio;
+  createdAt:    number;
+  id:           string;
+  imageSize?:   ImageSize;
+  messages:     Array<ThreadMessage>;
+  mode:         Mode;
+  name:         string;
+  updatedAt:    number;
 }
 
-export type { Config, MessagePart, Mode, PendingInput, Thread, ThreadMessage };
+export type {
+  AspectRatio,
+  Config,
+  ImageSize,
+  MessagePart,
+  Mode,
+  PendingInput,
+  Thread,
+  ThreadMessage,
+};

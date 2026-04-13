@@ -16,7 +16,14 @@ import { SettingsModal } from "./components/settingsModal.tsx";
 import { Sidebar } from "./components/sidebar.tsx";
 import { ThreadView } from "./components/threadView.tsx";
 import { WelcomeScreen } from "./components/welcomeScreen.tsx";
-import type { Config, Mode, PendingInput, Thread } from "./types/index.ts";
+import type {
+  AspectRatio,
+  Config,
+  ImageSize,
+  Mode,
+  PendingInput,
+  Thread,
+} from "./types/index.ts";
 
 const generateThreadName = (mode: Mode, text?: string): string => {
   if (
@@ -120,11 +127,18 @@ const app = (): JSX.Element => {
   });
 
   const handleNewThread = useCallback(
-    (mode: Mode): void => {
+    (
+      mode:        Mode,
+      aspectRatio: AspectRatio | undefined,
+      imageSize:   ImageSize,
+    ): void => {
       const now = Date.now();
       const createdThread: Thread = {
+        /* eslint-disable-next-line stylistic/no-extra-parens -- Required for conditional spread with exactOptionalPropertyTypes */
+        ...(aspectRatio !== undefined && { aspectRatio }),
         createdAt: now,
         id:        generateId(),
+        imageSize: imageSize,
         messages:  [],
         mode:      mode,
         name:      `New ${mode} thread`,

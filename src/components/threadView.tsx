@@ -68,19 +68,19 @@ const modeLabel = (mode: Mode): string => {
 interface BuildUserPartsOptions {
   readonly imageBase64?: string;
   readonly imageMime?:   string;
-  readonly mode:         Mode;
   readonly text:         string;
 }
 
 const buildUserParts = ({
   imageBase64,
   imageMime,
-  mode,
   text,
 }: BuildUserPartsOptions): Array<MessagePart> => {
   const userParts: Array<MessagePart> = [];
 
-  if (mode === "replace" && imageBase64 !== undefined) {
+  if (imageBase64 === undefined) {
+    userParts.push({ text: text, type: "text" });
+  } else {
     userParts.push({
       imageData: imageBase64,
       mimeType:  imageMime ?? "image/png",
@@ -89,8 +89,6 @@ const buildUserParts = ({
     if (text.length > 0) {
       userParts.push({ text: text, type: "text" });
     }
-  } else {
-    userParts.push({ text: text, type: "text" });
   }
 
   return userParts;
@@ -174,13 +172,18 @@ const threadView = ({
       onLoadingChange(true);
       onErrorChange(undefined);
 
-      const { messages, mode } = thread;
+      const {
+        aspectRatio,
+        imageSize: rawImageSize,
+        messages,
+        mode,
+      } = thread;
+      const imageSize = rawImageSize ?? "4K";
       const userParts = buildUserParts({
         /* eslint-disable-next-line stylistic/no-extra-parens -- Required for conditional spread with exactOptionalPropertyTypes */
         ...(imageBase64 !== undefined && { imageBase64 }),
         /* eslint-disable-next-line stylistic/no-extra-parens -- Required for conditional spread with exactOptionalPropertyTypes */
         ...(imageMime !== undefined && { imageMime }),
-        mode,
         text,
       });
 
@@ -217,7 +220,9 @@ const threadView = ({
             "send_message",
             {
               apiKey,
+              aspectRatio,
               history,
+              imageSize,
               mode,
               userImageBase64,
               userImageMime,
@@ -253,7 +258,13 @@ const threadView = ({
 
   const handleRetry = useCallback(
     (modelMessageIndex: number): void => {
-      const { messages, mode } = thread;
+      const {
+        aspectRatio,
+        imageSize: rawImageSize,
+        messages,
+        mode,
+      } = thread;
+      const imageSize = rawImageSize ?? "4K";
       const userMessageIndex = modelMessageIndex - 1;
       const userMessage = messages[userMessageIndex];
 
@@ -300,7 +311,9 @@ const threadView = ({
           }
           const response = await invoke<SendResult>("send_message", {
             apiKey,
+            aspectRatio,
             history,
+            imageSize,
             mode,
             userImageBase64,
             userImageMime,
@@ -353,7 +366,13 @@ const threadView = ({
 
   const handleEditCommit = useCallback(
     (messageIndex: number, editedText: string): void => {
-      const { messages, mode } = thread;
+      const {
+        aspectRatio,
+        imageSize: rawImageSize,
+        messages,
+        mode,
+      } = thread;
+      const imageSize = rawImageSize ?? "4K";
       const originalMessage = messages[messageIndex];
       if (originalMessage === undefined) {
         return;
@@ -404,7 +423,9 @@ const threadView = ({
           }
           const response = await invoke<SendResult>("send_message", {
             apiKey,
+            aspectRatio,
             history,
+            imageSize,
             mode,
             userImageBase64,
             userImageMime,
@@ -536,7 +557,11 @@ const threadView = ({
         {...(pendingInput?.text !== undefined && {
           initialText: pendingInput.text,
         })}
+        {...(thread.aspectRatio !== undefined && {
+          aspectRatio: thread.aspectRatio,
+        })}
         hasMessages={thread.messages.length > 0}
+        imageSize={thread.imageSize ?? "4K"}
         isLoading={isLoading}
         mode={thread.mode}
         onInputChange={onPendingInputChange}
