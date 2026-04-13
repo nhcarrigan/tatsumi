@@ -83,22 +83,26 @@ fn build_user_gemini_parts(
     user_image_base64: &Option<String>,
     user_image_mime: &Option<String>,
 ) -> Vec<Value> {
-    if mode == "replace" && user_image_base64.is_some() {
+    if let Some(image_data) = user_image_base64.as_deref() {
         let mime = user_image_mime.as_deref().unwrap_or("image/png");
-        let data = user_image_base64.as_deref().unwrap_or("");
         let base_text = user_text.as_deref().unwrap_or("");
-        let final_text = if base_text.is_empty() {
-            REPLACE_MODE_APPEND.to_string()
+        let final_text = if mode == "replace" {
+            if base_text.is_empty() {
+                REPLACE_MODE_APPEND.to_string()
+            } else {
+                format!("{}\n{}", base_text, REPLACE_MODE_APPEND)
+            }
         } else {
-            format!("{}\n{}", base_text, REPLACE_MODE_APPEND)
+            base_text.to_string()
         };
 
-        vec![
-            json!({"inlineData": {"mimeType": mime, "data": data}}),
-            json!({"text": final_text}),
-        ]
+        let mut parts = vec![json!({"inlineData": {"mimeType": mime, "data": image_data}})];
+        if !final_text.is_empty() {
+            parts.push(json!({"text": final_text}));
+        }
+        parts
     } else {
-        // Art/avatar mode, or replace mode follow-up correction (text only)
+        // No image: text-only message
         let text = user_text.as_deref().unwrap_or("");
         vec![json!({"text": text})]
     }
