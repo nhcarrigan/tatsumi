@@ -115,17 +115,30 @@ fn build_user_gemini_parts(
     }
 }
 
+pub struct GeminiCallParams {
+    pub mode: String,
+    pub aspect_ratio: Option<String>,
+    pub image_size: String,
+    pub user_text: Option<String>,
+    pub user_image_base64: Option<String>,
+    pub user_image_mime: Option<String>,
+}
+
 pub async fn call_gemini(
     api_key: String,
-    mode: String,
-    aspect_ratio: Option<String>,
-    image_size: String,
     history: Vec<ThreadMessage>,
-    user_text: Option<String>,
-    user_image_base64: Option<String>,
-    user_image_mime: Option<String>,
+    params: GeminiCallParams,
 ) -> Result<(Vec<MessagePart>, f64), String> {
     let client = reqwest::Client::new();
+
+    let GeminiCallParams {
+        mode,
+        aspect_ratio,
+        image_size,
+        user_text,
+        user_image_base64,
+        user_image_mime,
+    } = params;
 
     let is_first_message = history.is_empty();
 
