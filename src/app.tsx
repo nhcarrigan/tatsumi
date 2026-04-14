@@ -25,15 +25,118 @@ import type {
   Thread,
 } from "./types/index.ts";
 
-const generateThreadName = (mode: Mode, text?: string): string => {
-  if (
-    mode === "replace"
-    || text === undefined
-    || text.trim().length === 0
-  ) {
-    return `Replace - ${new Date().toLocaleString()}`;
-  }
-  return text.trim().slice(0, 40);
+const adjectives = [
+  "Amber",
+  "Ancient",
+  "Arctic",
+  "Azure",
+  "Blazing",
+  "Celestial",
+  "Cobalt",
+  "Crimson",
+  "Crystal",
+  "Dark",
+  "Distant",
+  "Ember",
+  "Emerald",
+  "Eternal",
+  "Ethereal",
+  "Fleeting",
+  "Frosted",
+  "Gilded",
+  "Golden",
+  "Hidden",
+  "Hollow",
+  "Indigo",
+  "Ivory",
+  "Jade",
+  "Lunar",
+  "Midnight",
+  "Mystic",
+  "Neon",
+  "Obsidian",
+  "Onyx",
+  "Opal",
+  "Pale",
+  "Pearl",
+  "Radiant",
+  "Rusted",
+  "Sapphire",
+  "Scarlet",
+  "Shattered",
+  "Silent",
+  "Silver",
+  "Spectral",
+  "Twilight",
+  "Velvet",
+  "Verdant",
+  "Veiled",
+  "Violet",
+  "Wandering",
+  "Wild",
+  "Woven",
+  "Arcane",
+];
+
+const nouns = [
+  "Abyss",
+  "Archive",
+  "Aria",
+  "Bloom",
+  "Cascade",
+  "Chronicle",
+  "Cipher",
+  "Compass",
+  "Crown",
+  "Dawn",
+  "Dream",
+  "Echo",
+  "Elegy",
+  "Ember",
+  "Equinox",
+  "Flame",
+  "Fragment",
+  "Garden",
+  "Horizon",
+  "Labyrinth",
+  "Lantern",
+  "Mirage",
+  "Mist",
+  "Murmur",
+  "Nexus",
+  "Nocturne",
+  "Oracle",
+  "Phantom",
+  "Prism",
+  "Requiem",
+  "Reverie",
+  "Ruin",
+  "Shadow",
+  "Shard",
+  "Silence",
+  "Solstice",
+  "Sonata",
+  "Specter",
+  "Storm",
+  "Tempest",
+  "Throne",
+  "Tide",
+  "Veil",
+  "Vortex",
+  "Whisper",
+  "Zenith",
+  "Sigil",
+  "Glyph",
+  "Dusk",
+  "Omen",
+];
+
+const generateThreadName = (): string => {
+  const adjectiveIndex = Math.floor(Math.random() * adjectives.length);
+  const nounIndex = Math.floor(Math.random() * nouns.length);
+  const adjective = adjectives[adjectiveIndex] ?? "Arcane";
+  const noun = nouns[nounIndex] ?? "Reverie";
+  return `${adjective} ${noun}`;
 };
 
 const generateId = (): string => {
@@ -74,13 +177,7 @@ const resolveUpdatedThread = (updatedThread: Thread): Thread => {
     return updatedThread;
   }
 
-  const firstTextPart = firstMessage.parts.find((part) => {
-    return part.type === "text";
-  });
-  const name = generateThreadName(
-    updatedThread.mode,
-    firstTextPart?.text,
-  );
+  const name = generateThreadName();
   return { ...updatedThread, name };
 };
 
