@@ -19,7 +19,12 @@ import {
   type JSX,
   type KeyboardEvent,
 } from "react";
-import type { Mode, PendingInput } from "../types/index.ts";
+import type {
+  AspectRatio,
+  ImageSize,
+  Mode,
+  PendingInput,
+} from "../types/index.ts";
 
 const dropZoneBaseClass = [
   "border-2 border-dashed rounded-xl p-8",
@@ -113,14 +118,19 @@ const readClipboardImage = async(
   onFileRead(new File([ blob ], "clipboard.png", { type: imageType }));
 };
 
-const modeLabelText = (mode: Mode): string => {
+const modeLabelText = (
+  mode:        Mode,
+  aspectRatio: AspectRatio | undefined,
+  imageSize:   ImageSize,
+): string => {
   if (mode === "avatar") {
-    return "🟣 Avatar Mode (1:1)";
+    return `🟣 Avatar Mode · ${imageSize}`;
   }
   if (mode === "art") {
-    return "🩷 Art Mode (16:9)";
+    const ratio = aspectRatio ?? "16:9";
+    return `🩷 Art Mode (${ratio}) · ${imageSize}`;
   }
-  return "🔵 Replace Mode";
+  return `🔵 Replace Mode · ${imageSize}`;
 };
 
 type OnSendCallback = (
@@ -130,7 +140,9 @@ type OnSendCallback = (
 )=> void;
 
 interface InputAreaProperties {
+  readonly aspectRatio?:         AspectRatio;
   readonly hasMessages:          boolean;
+  readonly imageSize:            ImageSize;
   readonly initialImageBase64?:  string;
   readonly initialImageMime?:    string;
   readonly initialImagePreview?: string;
@@ -144,7 +156,9 @@ interface InputAreaProperties {
 /**
  * Renders the input area for composing and sending messages.
  * @param props - The component props.
+ * @param props.aspectRatio - The thread's aspect ratio setting (Art mode only).
  * @param props.hasMessages - Whether the thread already has messages (affects replace mode UI).
+ * @param props.imageSize - The thread's resolution setting.
  * @param props.initialImageBase64 - Initial base64 image data to pre-populate.
  * @param props.initialImageMime - Initial image MIME type to pre-populate.
  * @param props.initialImagePreview - Initial image preview URL to pre-populate.
@@ -156,7 +170,9 @@ interface InputAreaProperties {
  * @returns The JSX element.
  */
 const inputArea = ({
+  aspectRatio,
   hasMessages,
+  imageSize,
   initialImageBase64,
   initialImageMime,
   initialImagePreview,
@@ -340,7 +356,7 @@ const inputArea = ({
     <div className="border-t border-purple-900/30 p-4 bg-[#0f0a1a]">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xs text-gray-500 uppercase tracking-wider">
-          {modeLabelText(mode)}
+          {modeLabelText(mode, aspectRatio, imageSize)}
         </span>
       </div>
 

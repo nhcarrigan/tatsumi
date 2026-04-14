@@ -25,11 +25,19 @@ pub struct ThreadMessage {
     pub cost_usd: Option<f64>,
 }
 
+fn default_image_size() -> String {
+    "4K".to_string()
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Thread {
     pub id: String,
     pub name: String,
     pub mode: String,
+    #[serde(rename = "aspectRatio", skip_serializing_if = "Option::is_none")]
+    pub aspect_ratio: Option<String>,
+    #[serde(rename = "imageSize", default = "default_image_size")]
+    pub image_size: String,
     pub messages: Vec<ThreadMessage>,
     #[serde(rename = "createdAt")]
     pub created_at: i64,

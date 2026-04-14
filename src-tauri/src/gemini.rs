@@ -46,12 +46,19 @@ fn build_safety_settings() -> Value {
     ])
 }
 
-fn build_generation_config(mode: &str) -> Value {
+fn build_generation_config(
+    mode: &str,
+    aspect_ratio: Option<&str>,
+    image_size: &str,
+) -> Value {
     let image_config = match mode {
-        "avatar" => json!({ "aspectRatio": "1:1", "imageSize": "4K" }),
-        "art"    => json!({ "aspectRatio": "16:9", "imageSize": "4K" }),
+        "avatar" => json!({ "aspectRatio": "1:1", "imageSize": image_size }),
+        "art" => {
+            let ratio = aspect_ratio.unwrap_or("16:9");
+            json!({ "aspectRatio": ratio, "imageSize": image_size })
+        }
         // replace mode: omit aspectRatio so the model infers it from the source image
-        _        => json!({ "imageSize": "4K" }),
+        _ => json!({ "imageSize": image_size }),
     };
     json!({
         "imageConfig": image_config,
@@ -108,15 +115,30 @@ fn build_user_gemini_parts(
     }
 }
 
+pub struct GeminiCallParams {
+    pub mode: String,
+    pub aspect_ratio: Option<String>,
+    pub image_size: String,
+    pub user_text: Option<String>,
+    pub user_image_base64: Option<String>,
+    pub user_image_mime: Option<String>,
+}
+
 pub async fn call_gemini(
     api_key: String,
-    mode: String,
     history: Vec<ThreadMessage>,
-    user_text: Option<String>,
-    user_image_base64: Option<String>,
-    user_image_mime: Option<String>,
+    params: GeminiCallParams,
 ) -> Result<(Vec<MessagePart>, f64), String> {
     let client = reqwest::Client::new();
+
+    let GeminiCallParams {
+        mode,
+        aspect_ratio,
+        image_size,
+        user_text,
+        user_image_base64,
+        user_image_mime,
+    } = params;
 
     let is_first_message = history.is_empty();
 
@@ -160,7 +182,11 @@ pub async fn call_gemini(
 
     contents.push(json!({"role": "user", "parts": user_parts}));
 
-    let generation_config = build_generation_config(mode.as_str());
+    let generation_config = build_generation_config(
+        mode.as_str(),
+        aspect_ratio.as_deref(),
+        image_size.as_str(),
+    );
     let safety_settings = build_safety_settings();
 
     let request_body = json!({
@@ -252,8 +278,13 @@ pub async fn call_gemini(
     let candidates_tokens = usage["candidatesTokenCount"].as_u64().unwrap_or(0);
     let image_part_count = result_parts.iter().filter(|p| p.part_type == "image").count() as u64;
 
-    // Image output tokens (4K = 2000 tokens each) billed at $120/1M tokens
-    let image_output_tokens = image_part_count * 2_000_u64;
+    // Image output tokens per image vary by resolution, billed at $120/1M tokens
+    let tokens_per_image: u64 = match image_size.as_str() {
+        "1K" => 500,
+        "2K" => 1_000,
+        _    => 2_000, // 4K default
+    };
+    let image_output_tokens = image_part_count * tokens_per_image;
     // Remaining candidates tokens are text/thinking, billed at $12/1M tokens
     let text_output_tokens = candidates_tokens.saturating_sub(image_output_tokens);
 
