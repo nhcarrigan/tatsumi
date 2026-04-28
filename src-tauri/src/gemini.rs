@@ -11,11 +11,11 @@ Character design (always required):
 - Wavy ashen brown hair (colour and texture fixed; hairstyle can vary)
 - Very pale skin tone
 - Vibrant sky-blue eyes — important, commonly missed
-- Vampire fangs
+- Vampire fangs (only visible when mouth is open)
 - Glasses (pink-framed preferred, other styles acceptable)
 - Painted fingernails and toenails (any colour, never unpolished)
 - Slender build
-- Full body visible in frame; always barefoot, never wears socks
+- Full body visible in frame
 
 Composition (always required):
 - Single character only
